@@ -1,6 +1,40 @@
 Context managers for SWI Prolog
 ===============================
 
+Synopsis 
+--------
+
+```
+:- use_module(library(with)). 
+
+% IO streams automatically closed
+:- with(open('/tmp/foo.txt', write, Stream), 
+        format(Stream, 'My context was managed!', [])).
+
+
+% Asserted clauses automatically retracted.
+?- dynamic(foo/1),
+   with(assertz(foo(1) :- true),
+        (foo(X),
+         writeln(X))),        
+   foo(X),
+   writeln(X).   
+1
+false.
+
+% Changed setting automatically reverted
+?- [user].
+:- setting(mymod:foo, boolean, true, '').
+|: true.
+with(setting(mymod:foo, false), setting(mymod:foo, V)), setting(mymod:foo, V1). 
+V = false,
+V1 = true.
+
+```
+
+Description
+-----------
+
 This module provides context management for various types of Prolog
 objects, such as IO streams, dynamic clauses, and settings.  User
 defined contexts can be implemented using the multifile predicate
@@ -47,3 +81,16 @@ manage_context(assertz(A), assertz(A, B), erase(B)).
 manage_context(setting(A, B),  (setting(A, C), set_setting(A, B)), set_setting(A, C)).
 
 ```
+
+Installation
+------------
+
+Using SWI-Prolog 6.3 or later:
+
+```
+?- pack_install(with).
+
+```
+
+
+Author: Eyal Dechter 
