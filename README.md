@@ -5,10 +5,10 @@ Synopsis
 --------
 
 ```
-:- use_module(library(with)). 
+?- use_module(library(with)). 
 
 % IO streams automatically closed
-:- with(open('/tmp/foo.txt', write, Stream), 
+?- with(open('/tmp/foo.txt', write, Stream), 
         format(Stream, 'My context was managed!', [])).
 
 
