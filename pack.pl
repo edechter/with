@@ -1,7 +1,7 @@
 name(with).
 title('Context managers for SWI Prolog').
-version('v0.0.3').
+version('0.0.4').
 author('Eyal Dechter', 'eyaldechter@gmail.com').
 maintainer('Eyal Dechter', 'eyaldechter@gmail.com').
 packager('Eyal Dechter', 'eyaldechter@gmail.com').
-download('https://github.com/edechter/swip-pack-with/archive/*.zip').
+download('https://github.com/edechter/with/archive/*.zip').
