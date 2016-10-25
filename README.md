@@ -17,8 +17,8 @@ Synopsis
    with(assertz(foo(1) :- true),
         (foo(X),
          writeln(X))),        
-   foo(X),
-   writeln(X).   
+   foo(Y),
+   writeln(Y).   
 1
 false.
 
