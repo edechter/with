@@ -56,7 +56,29 @@
     ).
          
          
-         
-         
+'with setenv no previous value' :-
+    with(setenv('__not_an_env_var__', 'some value'),
+         getenv('__not_an_env_var__', 'some value')),
+    \+ getenv('__not_an_env_var__', _).
 
-    
+
+'with setenv restores previous value' :-
+    with(setenv('FOO', 'BAR'),
+         (
+             with(setenv('FOO', 'BAZ'),
+                  getenv('FOO', 'BAZ')),
+             getenv('FOO', 'BAR')
+         )).
+
+'with set_prolog_flag throws error if flag does not exist'(throws(error(existence_error(prolog_flag, _), _))) :-
+    with(set_prolog_flag('__this_flag_does_not_exist', true),
+         current_prolog_flag('__this_flag_does_not_exist', _)). 
+
+
+'with set_prolog_flag restroes previous value' :-
+    create_prolog_flag(my_flag, true, []), 
+    with(set_prolog_flag(my_flag, false),
+         current_prolog_flag(my_flag, false)),
+    current_prolog_flag(my_flag, true).
+
+

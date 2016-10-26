@@ -68,7 +68,7 @@ manage_context(setting(A, B),  (setting(A, C), set_setting(A, B)), set_setting(A
 %     
 
 :- meta_predicate with(:, 0).
-with(MTerm, Goal) :-
+with(MTerm, Goal) :- 
     strip_module(MTerm, M, Term),
     (term_has_context_manager(Term, M, Setup, Cleanup) ->
          setup_call_cleanup(ctx_must_succeed(M:Setup),
@@ -77,6 +77,7 @@ with(MTerm, Goal) :-
     ;
     existence_error(context_manager, MTerm)
     ).
+
 
 ctx_must_succeed(M:Goal) :-
     (M:Goal -> true
@@ -91,9 +92,6 @@ ctx_must_succeed(M:Goal) :-
 term_has_context_manager(Term, M, M:Setup, M:Cleanup) :-
     must_be(nonvar, Term),
     manage_context(Term, Setup, Cleanup).
-
-
-    
 
 
 
@@ -134,6 +132,46 @@ manage_context(setting(Setting, NewValue),
                set_setting(Setting, OldValue)
               ).
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     library(debug) context managers
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+manage_context(debug(Term), debug(Term), nodebug(Term)).
 
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     setenv/unsetenv context manager 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+manage_context(setenv(Name, Value),
+               (
+                   (getenv(Name, V) ->
+                        Previous = just(V)                        
+                   ;
+                   Previous = nothing                   
+                   ),
+                  setenv(Name, Value) 
+               ),
+               (Previous = just(V) ->
+                    setenv(Name, V)
+               ;
+               unsetenv(Name)                   
+               )
+              ).
 
-
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     set_prolog_flag context manager
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+manage_context(set_prolog_flag(Name, NewValue),
+               (
+                   (current_prolog_flag(Name, OldValue) ->
+                        set_prolog_flag(Name, NewValue)
+                   ;
+                   existence_error(prolog_flag, Name)
+                   )
+               ),
+               set_prolog_flag(Name, OldValue)
+              ).
+               
+               
+                    
+                   
+                   
+                        
