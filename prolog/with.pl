@@ -68,15 +68,31 @@ manage_context(setting(A, B),  (setting(A, C), set_setting(A, B)), set_setting(A
 %     
 
 :- meta_predicate with(:, 0).
-with(MTerm, Goal) :- 
+with(MList, Goal) :-
+    strip_module(MList, M, List),
+    is_list(List),
+    !,
+    collect_context_managers(List, M, SetupGoals, CleanupGoals),
+    setup_call_cleanup(maplist(call, SetupGoals),
+                       Goal,
+                       maplist(call, CleanupGoals)
+                      ).
+with(MTerm, Goal) :-
     strip_module(MTerm, M, Term),
+    with(M:[Term], Goal).
+
+
+%!    collect_context_managers(+Terms: list, +Mod: atom, -SetupGoals: list, -CleanupGoals: list) is det
+%
+collect_context_managers([], _, [], []).
+collect_context_managers([Term|Rest], M, [SetupGoal|SGs], [CleanupGoal|CGs]) :-
     (term_has_context_manager(Term, M, Setup, Cleanup) ->
-         setup_call_cleanup(ctx_must_succeed(M:Setup),
-                            Goal,
-                            ctx_must_succeed(M:Cleanup))
+         SetupGoal = ctx_must_succeed(Setup),
+         CleanupGoal = ctx_must_succeed(Cleanup)
     ;
-    existence_error(context_manager, MTerm)
-    ).
+    existence_error(context_manager, M:Term)
+    ),
+    collect_context_managers(Rest, M, SGs, CGs).
 
 
 ctx_must_succeed(M:Goal) :-
@@ -157,8 +173,6 @@ manage_context(nodebug(Spec),
 
                      
                 
-
-                    
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      setenv/unsetenv context manager 

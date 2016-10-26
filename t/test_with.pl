@@ -131,4 +131,17 @@ user:message_hook(debug_no_topic(_), _, _) :- !.
     
 
 
-
+'nested with' :-
+    with([setenv('FOO', 'BAR'),
+          assertz(foo(1)),
+          assertz(bar(X) :- foo(X))],
+         (
+             getenv('FOO', 'BAR'),
+             foo(1),
+             bar(1)
+         )
+        ),
+    \+ getenv('FOO', _),
+    \+ foo(_),
+    \+ bar(_).
+    
