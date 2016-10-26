@@ -121,9 +121,11 @@ user:message_hook(debug_no_topic(_), _, _) :- !.
     debug(my_debug > 'bar.txt'),
     sort(prolog_debug:debugging(my_debug, true, ~), OutList0), 
     with(nodebug(my_debug > 'foo.txt'),
-         (debugging(my_debug, true),          
-          \+ memberchk('foo.txt', prolog_debug:debugging(my_debug, true, ~))
-         ),          
+         (debugging(my_debug, true),
+          prolog_debug:debugging(my_debug, true, OutList1),
+          \+ memberchk('foo.txt', OutList1)
+         )
+        ),
     sort(prolog_debug:debugging(my_debug, true, ~), OutList),
     OutList0 == OutList. 
     
