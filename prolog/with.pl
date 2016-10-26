@@ -135,7 +135,30 @@ manage_context(setting(Setting, NewValue),
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      library(debug) context managers
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-manage_context(debug(Term), debug(Term), nodebug(Term)).
+manage_context(debug(Spec),
+               (
+                   prolog_debug:debug_target(Spec, Topic, _),
+                   (debugging(Topic, Previous) -> true; Previous = false),
+                   debug(Spec)
+               ),
+               (
+                   nodebug(Spec),
+                   ( (Previous == true, debugging(Topic, false)) ->
+                          debug(Topic)
+                     ;
+                     true
+                   )
+               )
+              ).
+
+manage_context(nodebug(Spec),
+               nodebug(Spec),
+               debug(Spec)). 
+
+                     
+                
+
+                    
 
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
      setenv/unsetenv context manager 
@@ -170,7 +193,8 @@ manage_context(set_prolog_flag(Name, NewValue),
                set_prolog_flag(Name, OldValue)
               ).
                
-               
+
+
                     
                    
                    

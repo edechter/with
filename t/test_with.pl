@@ -3,13 +3,29 @@
 :- prolog_load_context(directory, Dir),
    asserta(user:file_search_path(here, Dir)).
 
+%% Project Imports
+%% ===============
 :- use_module(here('../prolog/with')).
 
-
+%% Library Imports
+%% ===============
 :- use_module(library(settings)).
+:- use_module(library(func)).
+
+
+% a setting to test with
 :- setting(my_mod:foo, boolean, true, 'a setting').
 
 
+% Intercept debug_no_topic warning message, so it doesn't appear in test
+% output.
+:- multifile user:message_hook/3.
+user:message_hook(debug_no_topic(_), _, _) :- !. 
+
+
+/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     TAP Tests
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 :- use_module(library(tap)).
 
 'with file' :-
@@ -75,10 +91,42 @@
          current_prolog_flag('__this_flag_does_not_exist', _)). 
 
 
-'with set_prolog_flag restroes previous value' :-
+'with set_prolog_flag restores previous value' :-
     create_prolog_flag(my_flag, true, []), 
     with(set_prolog_flag(my_flag, false),
          current_prolog_flag(my_flag, false)),
     current_prolog_flag(my_flag, true).
+
+'with debug restores to false if undefined' :-
+    with(debug(my_debug),
+         debugging(my_debug, true)),
+    debugging(my_debug, false).
+
+'with debug restores to false' :-
+    nodebug(my_debug), 
+    with(debug(my_debug),
+         debugging(my_debug, true)),
+    debugging(my_debug, false).
+
+'with debug restores to true' :-
+    debug(my_debug), 
+    with(nodebug(my_debug),
+         debugging(my_debug, false)),
+    debugging(my_debug, true).
+
+'with debug restores to redirection' :-
+    tmp_file_stream(text, File, St), close(St),
+    debug(my_debug), 
+    debug(my_debug > 'foo.txt'),
+    debug(my_debug > 'bar.txt'),
+    sort(prolog_debug:debugging(my_debug, true, ~), OutList0), 
+    with(nodebug(my_debug > 'foo.txt'),
+         (debugging(my_debug, true),          
+          \+ memberchk('foo.txt', prolog_debug:debugging(my_debug, true, ~))
+         ),          
+    sort(prolog_debug:debugging(my_debug, true, ~), OutList),
+    OutList0 == OutList. 
+    
+
 
 
