@@ -32,16 +32,43 @@ V1 = true.
 
 ```
 
+% Automatically revert changes to environment
+?- with(setenv('FOO', 'BAR'), 
+       (getenv('FOO', V),
+        writeln(V))),
+   getenv('FOO', V),
+   writeln(V).
+BAR
+false.
+
+% And you can define your own!
+?- [user].
+with:manage_context(my_ctx(X), assert(foo(X)), retract(foo(X))).
+|: true.
+
+?- with(my_ctx(1), listing(foo)), listing(foo). 
+:- dynamic foo/1.
+
+foo(1).
+
+:- dynamic foo/1.
+
+true
+```
+
 Description
 -----------
 
 This module provides context management for various types of Prolog
-objects, such as IO streams, dynamic clauses, and settings.  User
-defined contexts can be implemented using the multifile predicate
-manage_context/3.  manage_context(Term, Setup, Cleanup) defines a
-setup/cleanup pair for a specific type of term. ```with(Term, Goal)```
-calls =Goal= using setup_call_cleanup/3, with the corresponding setup
-and cleanup goals. 
+objects. Builtin support includes IO Streams, environment variables,
+dynamic clauses, prolog flags, library(setting), and
+library(debug). User defined contexts can be implemented using the
+multifile predicate manage_context/3.  manage_context(Term, Setup,
+Cleanup) defines a setup/cleanup pair for a specific type of
+term. ```with(Term, Goal)``` calls =Goal= using setup_call_cleanup/3,
+with the corresponding setup and cleanup goals. If `List` is a list of
+terms then, ```with(List, Goal)``` nests the corresponding context
+managers.
 
 There is one difference between the semantics of setup_call_cleanup/3
 and the corresponding goal using this library. =Setup= and =Cleanup=
