@@ -30,7 +30,7 @@ with(setting(mymod:foo, false), setting(mymod:foo, V)), setting(mymod:foo, V1).
 V = false,
 V1 = true.
 
-```
+
 
 % Automatically revert changes to environment
 ?- with(setenv('FOO', 'BAR'), 
