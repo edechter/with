@@ -4,7 +4,7 @@ Context managers for SWI Prolog
 Synopsis 
 --------
 
-```
+```prolog
 ?- use_module(library(with)). 
 
 % IO streams automatically closed
@@ -78,7 +78,7 @@ goals must succeed. If they fail, the error
 For example, the provided manage_context/3 clause
 for opening files could be defined:
 
-```
+```prolog
 with:manage_context(open(File, Mode, Stream), 
                     open(File, Mode, Stream), 
                     close(Stream)).
@@ -87,7 +87,7 @@ with:manage_context(open(File, Mode, Stream),
 
 The result is that the following are equivalent: 
 
-```
+```prolog
 ?- setup_call_cleanup(open(File, read, Stream), 
    is_stream(Stream), 
    close(Stream)). 
@@ -100,7 +100,7 @@ The result is that the following are equivalent:
 To show defined context managers, using ```listing/1```. E.g, the
 context managers packaged with this module are:
 
-```
+```prolog
 ?- use_module(library(with)), listing(with:manage_context/3).
 
 manage_context(open(A, C, D),  (absolute_file_name(A, B), open(B, C, D)), close(D)).
@@ -114,7 +114,7 @@ Installation
 
 Using SWI-Prolog 6.3 or later:
 
-```
+```prolog
 ?- pack_install(with).
 
 ```
