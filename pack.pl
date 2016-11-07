@@ -5,3 +5,4 @@ author('Eyal Dechter', 'eyaldechter@gmail.com').
 maintainer('Eyal Dechter', 'eyaldechter@gmail.com').
 packager('Eyal Dechter', 'eyaldechter@gmail.com').
 download('https://github.com/edechter/with/releases/*.zip').
+requires(function_expansion).
